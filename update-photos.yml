@@ -1,0 +1,27 @@
+name: Photos Qwant puis Wikimedia
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 4 1 * *"
+
+permissions:
+  contents: write
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Rechercher les images Qwant puis Wikimedia
+        run: node tools/qwant-wikimedia-images.mjs
+      - name: Enregistrer photos.json
+        run: |
+          git config user.name "Carte photos bot"
+          git config user.email "actions@github.com"
+          git add photos.json
+          git diff --cached --quiet || git commit -m "Mise à jour photos Qwant/Wikimedia"
+          git push
